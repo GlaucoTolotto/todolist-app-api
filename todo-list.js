@@ -1,29 +1,20 @@
-const express = require('express')
-const app = express()
-const port = 8080
+const express = require('express');
+const app = express();
+const {APP_PORT} = require('./src/configuracao/config');
+//const {getHandler} = require('./src/controller/status-controller.js');
+const UsuarioController = require('./src/controller/usuariosController.js');
+const TarefasController = require('./src/controller/tarefasController');
+const Database = require('./src/infra/bd');
 
-app.get('/todolist', (req, res) => {
-  res.send('<h1>Bem Vindo a sua lista de tarefas</h1>')
-})
+const ControleDeUsuario = new UsuarioController(Database.usuariosDB)
+const ControleTarefas = new TarefasController(Database.tarefasDB)
 
-app.get('/todolist/atividade', (req, res) => {
-    res.send(`<h1>Rota ativada com GET e recurso "ATIVIDADES"</h1>
-                <ul>
-                <li>Escovar os dentes</li>
-                <li>Assistir a aula</li>
-                <li>Almoçar</li>
-                <li>Descançar</li>
-                </ul>
-    `)
-  })
+app.use(express.json());
 
-  app.get('/todolist/status-de-atividade', (req, res) => {
-    res.send(`<h1>Rota ativada com GET e recurso "STATUS DE ATIVIDADE"</h1>
-    
-    
-    `)
-  })
-  
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+app.get('/usuario', ControleDeUsuario.show);
+app.post('/usuario', ControleDeUsuario.store);
+
+app.get('/tarefas', ControleTarefas.show);
+app.post('/tarefas', ControleTarefas.store);
+
+app.listen(APP_PORT, ()=> console.log(`Vai aparecer neste link http://localhost:1234`));
